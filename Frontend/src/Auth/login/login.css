@@ -1,0 +1,144 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+}
+
+/* Center screen */
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Glass card */
+.card {
+  width: 360px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border-radius: 15px;
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  box-shadow: 0 0 25px rgba(34, 211, 238, 0.2);
+  text-align: center;
+  color: white;
+}
+
+.card h2 {
+  margin-bottom: 5px;
+}
+
+.card p {
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #cbd5e1;
+}
+
+/* Input */
+.inputBox {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.inputBox input {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  outline: none;
+  color: white;
+  transition: 0.3s;
+}
+
+.inputBox label {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: #94a3b8;
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+/* floating label */
+.inputBox input:focus + label,
+.inputBox input:valid + label {
+  top: -10px;
+  left: 10px;
+  font-size: 12px;
+  color: #22d3ee;
+}
+
+/* focus glow */
+.inputBox input:focus {
+  border-color: #22d3ee;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.4);
+}
+
+/* Options row */
+.options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #cbd5e1;
+  margin-bottom: 15px;
+}
+
+.options a {
+  color: #22d3ee;
+  text-decoration: none;
+}
+
+.options a:hover {
+  text-decoration: underline;
+}
+
+/* Button */
+button {
+  width: 100%;
+  padding: 12px;
+  background: #22d3ee;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 15px #22d3ee;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Register link */
+.register {
+  margin-top: 15px;
+  font-size: 13px;
+}
+
+.register a {
+  color: #22d3ee;
+  text-decoration: none;
+}
+
+.register a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .card {
+    width: 90%;
+  }
+}

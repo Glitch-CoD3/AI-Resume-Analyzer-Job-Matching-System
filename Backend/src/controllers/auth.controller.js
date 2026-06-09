@@ -33,7 +33,7 @@ const generateAccessToken = (userId, SassionId) => {
             SassionId: SassionId,
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '15m' }
+        { expiresIn: '10m' }
     )
 }
 
@@ -153,7 +153,7 @@ const loginUser = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: "strict",
-            maxAge: 15 * 60 * 1000
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
 
@@ -195,7 +195,7 @@ const logOutUser = async (req, res) => {
 
         // Step 4: Find session using userId (fast lookup)
         const session = await Session.findOne({
-            userId: decoded._id,
+            user: decoded.id,
             revoked: false
         });
 

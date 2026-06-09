@@ -1,0 +1,13 @@
+body {
+  background: radial-gradient(circle at top, #0f172a, #000000);
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}

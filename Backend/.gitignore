@@ -6,6 +6,7 @@ git remote add origin https://github.com/Glitch-CoD3/High-Secure-Authentication.
 git push -u origin main
 
 
+MODELSDB
 .env
 .env
 # Logs

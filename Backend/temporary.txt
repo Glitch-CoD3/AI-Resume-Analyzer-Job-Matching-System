@@ -1,0 +1,355 @@
+import { GoogleGenAI } from "@google/genai";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
+
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+
+
+const interviewReportZodSchema = z.object({
+  summary: z.string(),
+
+  strengths: z.array(z.string()),
+  resumeIssues: z.array(z.string()),
+  improvementSuggestions: z.array(z.string()),
+
+  keywordAnalysis: z.object({
+    matchedKeywords: z.array(z.string()),
+    missingKeywords: z.array(z.string()),
+    keywordMatchPercentage: z.number().min(0).max(100),
+  }),
+
+  resumeRewrite: z.object({
+    before: z.string(),
+    after: z.string(),
+  }),
+
+  learningRoadmap: z.array(
+    z.object({
+      skill: z.string(),
+      priority: z.enum(["high", "medium", "low"]),
+      reason: z.string(),
+      resources: z.array(z.string()),
+    })
+  ),
+
+  skillGaps: z.array(
+    z.object({
+      skill: z.string(),
+      severity: z.enum(["low", "medium", "high"]),
+    })
+  ),
+
+  technicalQuestions: z.array(
+    z.object({
+      question: z.string(),
+      intention: z.string(),
+      answer: z.string(),
+    })
+  ),
+
+  behavioralQuestions: z.array(
+    z.object({
+      question: z.string(),
+      intention: z.string(),
+      answer: z.string(),
+    })
+  ),
+
+  preparationPlan: z.array(
+    z.object({
+      day: z.number(),
+      focus: z.string(),
+      task: z.string(),
+    })
+  ),
+
+  overallScore: z.number().min(0).max(100),
+  matchScore: z.number().min(0).max(100),
+  atsScore: z.number().min(0).max(100),
+});
+
+
+// ✅ Clean AI function
+export async function generateInterviewReport({ resume, selfdescribe, jobdescribe }) {
+
+  const prompt = `
+You are a senior technical interviewer and career coach AI.
+
+Your task is to analyze a candidate's resume, self-description, and a job description, then generate a COMPLETE professional interview report.
+
+⚠️ STRICT OUTPUT RULES:
+- Return ONLY valid JSON (no markdown, no explanation)
+- Follow the provided schema EXACTLY
+- All arrays must be arrays (never strings)
+- Do not omit any required fields
+- Keep responses concise but highly informative
+- Use professional and realistic industry language
+
+🎯 ANALYSIS GOALS:
+1. Evaluate how well the candidate matches the job
+2. Identify strengths and weaknesses
+3. Detect missing keywords (ATS perspective)
+4. Provide actionable improvement suggestions
+5. Generate realistic interview questions and answers
+
+📊 REQUIREMENTS:
+
+- summary → 2–3 lines professional evaluation
+- strengths → at least 3 strong points
+- resumeIssues → at least 3 real problems
+- improvementSuggestions → at least 4 actionable fixes
+
+- keywordAnalysis:
+  - matchedKeywords → relevant matched skills
+  - missingKeywords → critical missing skills
+  - keywordMatchPercentage → realistic score (0–100)
+
+- resumeRewrite:
+  - before → weak/improvable sentence from resume
+  - after → improved professional version with impact
+
+- learningRoadmap:
+  - at least 3 skills
+  - each must include: skill, priority, reason, resources
+
+- skillGaps:
+  - at least 3 items
+  - severity must be: low | medium | high
+
+- technicalQuestions:
+  - at least 5 questions
+  - must include intention + strong sample answer
+
+- behavioralQuestions:
+  - at least 3 questions
+  - must include intention + structured answer
+
+- preparationPlan:
+  - at least 5 days
+  - realistic learning progression
+
+- overallScore, matchScore, atsScore:
+  - numbers between 0–100
+  - must be realistic and consistent with analysis
+
+📥 INPUT DATA:
+
+JOB DESCRIPTION:
+${jobdescribe}
+
+RESUME:
+${resume}
+
+SELF DESCRIPTION:
+${selfdescribe}
+`;
+
+
+  const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: zodToJsonSchema(interviewReportZodSchema),
+        }
+    })
+
+  // Double check if text exists before parsing
+  if (response) {
+    try {
+      return JSON.parse(response.text);
+    } catch (e) {
+      console.error("JSON Parse Error. Raw text was:", response.text);
+      throw new Error("AI returned incomplete JSON. Try shortening the prompt requirements.");
+    }
+  } else {
+    throw new Error("No response text received from AI.");
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+ai.service.js
+
+import { GoogleGenAI } from "@google/genai";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
+
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+
+
+const interviewReportZodSchema = z.object({
+  summary: z.string(),
+
+  strengths: z.array(z.string()),
+  resumeIssues: z.array(z.string()),
+  improvementSuggestions: z.array(z.string()),
+
+  keywordAnalysis: z.object({
+    matchedKeywords: z.array(z.string()),
+    missingKeywords: z.array(z.string()),
+    keywordMatchPercentage: z.number().min(0).max(100),
+  }),
+
+  resumeRewrite: z.object({
+    before: z.string(),
+    after: z.string(),
+  }),
+
+  learningRoadmap: z.array(
+    z.object({
+      skill: z.string(),
+      priority: z.enum(["high", "medium", "low"]),
+      reason: z.string(),
+      resources: z.array(z.string()),
+    })
+  ),
+
+  skillGaps: z.array(
+    z.object({
+      skill: z.string(),
+      severity: z.enum(["low", "medium", "high"]),
+    })
+  ),
+
+  technicalQuestions: z.array(
+    z.object({
+      question: z.string(),
+      intention: z.string(),
+      answer: z.string(),
+    })
+  ),
+
+  behavioralQuestions: z.array(
+    z.object({
+      question: z.string(),
+      intention: z.string(),
+      answer: z.string(),
+    })
+  ),
+
+  preparationPlan: z.array(
+    z.object({
+      day: z.number(),
+      focus: z.string(),
+      task: z.string(),
+    })
+  ),
+
+  overallScore: z.number().min(0).max(100),
+  matchScore: z.number().min(0).max(100),
+  atsScore: z.number().min(0).max(100),
+});
+
+
+// ✅ Clean AI function
+export async function generateInterviewReport({ resume, selfdescribe, jobdescribe }) {
+
+ const prompt = `
+You are a senior technical interviewer and career coach AI. 
+
+Your task is to analyze a candidate's resume, self-description, and a job description to generate a COMPLETE professional interview report.
+
+⚠️ STRICT OUTPUT RULES:
+- Return ONLY a single, valid JSON object.
+- NO markdown formatting (no \`\`\`json), NO conversational text, NO explanations.
+- Follow the structure of the "TEMPLATE" provided below exactly.
+- Ensure all types (Number vs String) match the schema requirements.
+- If a field is optional and you have no data, return null or an empty array as appropriate, but do not omit the key.
+
+🎯 ANALYSIS GOALS:
+1. Evaluate how well the candidate matches the job.
+2. Identify strengths and weaknesses.
+3. Detect missing keywords (ATS perspective).
+4. Provide actionable improvement suggestions.
+5. Generate realistic interview questions, answers, and a 5-day prep plan.
+
+🏗️ JSON TEMPLATE (Follow this structure):
+{
+  "user": "PASTE_USER_ID_HERE", 
+  "jobDescription": "Full job description text",
+  "resumeText": "Full resume text",
+  "selfDescription": "Full self description text",
+  "summary": "2-3 line professional evaluation",
+  "strengths": ["at least 3 strings"],
+  "resumeIssues": ["at least 3 strings"],
+  "improvementSuggestions": ["at least 4 strings"],
+  "keywordAnalysis": {
+    "matchedKeywords": [],
+    "missingKeywords": [],
+    "keywordMatchPercentage": 0
+  },
+  "resumeRewrite": {
+    "before": "Original weak sentence",
+    "after": "Improved high-impact version"
+  },
+  "learningRoadmap": [
+    { "skill": "", "priority": "high/medium/low", "reason": "", "resources": ["url or book"] }
+  ],
+  "technicalQuestions": [
+    { "question": "", "intention": "", "answer": "" }
+  ],
+  "behavioralQuestions": [
+    { "question": "", "intention": "", "answer": "" }
+  ],
+  "skillGaps": [
+    { "skill": "", "severity": "low/medium/high" }
+  ],
+  "preparationPlan": [
+    { "day": 1, "focus": "", "task": "" }
+  ],
+  "overallScore": 0,
+  "matchScore": 0,
+  "atsScore": 0
+}
+
+📥 INPUT DATA:
+
+JOB DESCRIPTION:
+${jobdescribe}
+
+RESUME:
+${resume}
+
+SELF DESCRIPTION:
+${selfdescribe}
+`;
+
+
+  const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: zodToJsonSchema(interviewReportZodSchema),
+        }
+    })
+
+  // Double check if text exists before parsing
+  if (response) {
+    try {
+      return JSON.parse(response.text);
+    } catch (e) {
+      console.error("JSON Parse Error. Raw text was:", response.text);
+      throw new Error("AI returned incomplete JSON. Try shortening the prompt requirements.");
+    }
+  } else {
+    throw new Error("No response text received from AI.");
+  }
+}

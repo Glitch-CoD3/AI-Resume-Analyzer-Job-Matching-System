@@ -30,6 +30,7 @@ Email Service: Nodemailer (OTP delivery)
 
 📦 Dependencies
 {
+
   "bcrypt": "^6.0.0",
   "cookie-parser": "^1.4.7",
   "dotenv": "^17.4.1",
@@ -38,41 +39,9 @@ Email Service: Nodemailer (OTP delivery)
   "mongoose": "^9.4.1",
   "nodemailer": "^8.0.5",
   "nodemon": "^3.1.14"
+  
 }
 
-
-Backend/
-│── node_modules/
-│── src/
-│   ├── config/
-│   │   └── db.config.js          # Database connection setup
-│   │
-│   ├── controllers/
-│   │   └── auth.controller.js   # Authentication logic (login, register, OTP)
-│   │
-│   ├── models/
-│   │   ├── user.models.js       # User schema
-│   │   ├── OTP.models.js        # OTP schema (hashed OTP)
-│   │   ├── session.models.js    # Session management (hashed refresh token)
-│   │   └── tokenBlacklist.models.js # Blacklisted tokens
-│   │
-│   ├── routes/
-│   │   └── auth.routes.js       # Authentication routes
-│   │
-│   ├── services/
-│   │   └── email.js             # OTP email sending service
-│   │
-│   ├── utils/
-│   │   └── utils.js             # Helper functions
-│   │
-│   ├── app.js                   # Express app configuration
-│   └── constant.js              # Constants used across project
-│
-│── .env                         # Environment variables
-│── .gitignore
-│── package.json
-│── package-lock.json
-│── server.js                    # Entry point
 
 
 
