@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { loginUser, userRegister, logOutUser, logOutAllDevices, refresh, verifyEmail } from '../controllers/auth.controller.js';
+import { loginUser, userRegister, logOutUser, logOutAllDevices, refresh, verifyEmail, forgetPassword, resetPassword } from '../controllers/auth.controller.js';
 import { isAuthenticated } from '../middleware/auth.middleware.js';
 
 const router = Router()
@@ -41,6 +41,21 @@ router.post('/logout', isAuthenticated, logOutUser)
  */
 router.post('/logout-all', isAuthenticated, logOutAllDevices)
 
+/**
+ * @API POST api/v1/auth/forget-password
+ * @description Initiate the password reset process for a user
+ *@access public 
+ */
+
+router.post('/forget-password', forgetPassword)
+
+
+/**
+ * @API POST api/v1/auth/reset-password
+ * @description Reset the user's password
+ *@access public 
+ */
+router.post('/reset-password', resetPassword)
 
 /**
  * @API GET api/v1/auth/refresh

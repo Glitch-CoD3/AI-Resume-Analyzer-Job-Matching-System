@@ -31,7 +31,7 @@ const ResetPassword = () => {
     try {
       await AxiosInstance.post("auth/reset-password", {
         email: email,
-        password: form.password
+        newPassword: form.password
       });
 
       alert("Password updated successfully!");

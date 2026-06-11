@@ -14,7 +14,7 @@ const ForgotPassword = () => {
 
     try {
       // 1. Make the API call to send the reset email/link
-      const response = await AxiosInstance.post("auth/forgot-password", {
+      const response = await AxiosInstance.post("auth/forget-password", {
         email: email,
       });
 

@@ -2,10 +2,11 @@ import { User } from '../models/user.models.js';
 // import { tokenBlacklist } from '../models/blacklist.models.js';
 import { Session } from '../models/session.models.js';
 import { sendEmail } from '../services/email.js';
-import { OTP } from '../models/otp.models.js';
+import { OTP } from '../models/OTP.models.js';
 import { getOtpHtml, generateOTP } from '../utils/utils.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { verifyOTP } from '../utils/OTPverify.js';
 
 /**
  * @name generateRefreshToken
@@ -341,16 +342,10 @@ const verifyEmail = async (req, res) => {
     try {
         const { email, otp } = req.body;
 
-        const otpRecord = await OTP.findOne({ email });
+        const isOTPValid = await verifyOTP(email, otp);
 
-        if (!otpRecord) {
-            return res.status(400).json({ message: "Invalid OTP" });
-        }
-
-        const isMatch = await bcrypt.compare(otp, otpRecord.otpHashed);
-
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid OTP" });
+        if (!isOTPValid) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
         }
 
         const user = await User.findOne({ email });
@@ -375,4 +370,60 @@ const verifyEmail = async (req, res) => {
     }
 }
 
-export { userRegister, loginUser, logOutUser, logOutAllDevices, refresh, verifyEmail }
+
+/**
+ * @name forgetPassword
+ * @description Initiate the password reset process for a user
+ *@access private 
+ */
+const forgetPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                message: "Email is required"
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        return res.status(200).json({
+            success: true,
+            message: "If a user with that email exists, a password reset link has been sent"
+        });
+
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Server Error"
+        });
+    }
+};
+
+
+const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+        if (!newPassword || !email) {
+            return res.status(400).json({ message: "New password and email are required" });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user.password = newPassword;
+        await user.save();
+        return res.status(200).json({ message: "Password reset successfully" });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Server Error"
+        });
+    }
+};
+
+export { userRegister, loginUser, logOutUser, logOutAllDevices, refresh, verifyEmail, forgetPassword, resetPassword }
