@@ -60,6 +60,7 @@ export const generateInterViewReportController = async (req, res) => {
         // }
 
         // console.log(resumeText);
+        
 
        const { resume, selfdescribe, jobdescribe } = req.body;
             if (!resume || !selfdescribe || !jobdescribe) { 

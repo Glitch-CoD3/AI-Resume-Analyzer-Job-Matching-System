@@ -155,7 +155,6 @@ const interviewReportSchema = new Schema(
     // 📊 Scores
     overallScore: {
       type: Number,
-      required: true,
       min: 0,
       max: 100,
     },
