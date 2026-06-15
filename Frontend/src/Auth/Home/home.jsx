@@ -1,171 +1,181 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, Sparkles } from "lucide-react";
 
-const Home = () => {
-  const [selfDesc, setSelfDesc] = useState("");
-  const [jobDesc, setJobDesc] = useState("");
-  const [resume, setResume] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [output, setOutput] = useState(null);
+export default function HomePage() {
+  const [activeChat, setActiveChat] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const handleProcess = async () => {
-    setLoading(true);
-    setOutput(null);
+  const history = [
+    { id: 1, title: "AI Chat System" },
+    { id: 2, title: "Database Design Help" },
+    { id: 3, title: "React UI Fixing" },
+  ];
 
-    // mock AI delay
-    setTimeout(() => {
-      setOutput({
-        match: "87%",
-        summary:
-          "Your profile matches strongly with the job role. Your skills align well with backend development and system design.",
-        strengths: ["React", "Node.js", "Problem Solving"],
-        improvements: ["Add more system design projects", "Improve DevOps basics"],
-      });
+  const [form, setForm] = useState({
+    f1: "",
+    f2: "",
+    f3: "",
+  });
 
-      setLoading(false);
-    }, 2000);
-  };
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   return (
-    <div className="min-h-screen w-full bg-[#0a1023] text-white flex flex-col items-center px-4 py-10">
+    <div className="h-screen w-full flex flex-col bg-[#0b0f1a] text-white overflow-hidden">
 
- {/* Title */}
-{/* Title */}
-<h1 className="text-3xl md:text-4xl font-bold !text-white mb-2 text-center">
-  AI Career Analyzer
-</h1>
-
-<p className="!text-white mb-10 text-center max-w-xl">
-  Upload your profile, resume and job description to get AI insights
-</p>
-
-{/* INPUT CONTAINER */}
-<div className="w-full max-w-2xl bg-black/40 border border-cyan-400/20 rounded-2xl backdrop-blur-lg p-6 space-y-6 shadow-[0_0_30px_rgba(0,212,255,0.15)]">
-
-  {/* Self Description */}
-  <div>
-    <label className="!text-white text-sm mb-2 block">
-      Self Description
-    </label>
-
-    <textarea
-      className="w-full h-32 bg-transparent border border-white/10 rounded-xl p-3 outline-none focus:border-cyan-400 transition !text-white placeholder:!text-white/50"
-      placeholder="Write about yourself..."
-      value={selfDesc}
-      onChange={(e) => setSelfDesc(e.target.value)}
-    />
-  </div>
-
-  {/* Resume Upload */}
-  <div className="flex flex-col items-center justify-center border border-white/10 rounded-xl p-6">
-    <label className="!text-white text-sm mb-3">
-      Upload Resume
-    </label>
-
-    <input
-      type="file"
-      id="resume"
-      className="hidden"
-      onChange={(e) => setResume(e.target.files[0])}
-    />
-
-    <label
-      htmlFor="resume"
-      className="px-5 py-3 bg-cyan-500 !text-white rounded-lg cursor-pointer hover:shadow-[0_0_20px_cyan] transition"
-    >
-      Choose File
-    </label>
-
-    {resume && (
-      <p className="!text-white text-sm mt-3">
-        📄 {resume.name}
-      </p>
-    )}
-  </div>
-
-  {/* Job Description */}
-  <div>
-    <label className="!text-white text-sm mb-2 block">
-      Job Description
-    </label>
-
-    <textarea
-      className="w-full h-32 bg-transparent border border-white/10 rounded-xl p-3 outline-none focus:border-cyan-400 transition !text-white placeholder:!text-white/50"
-      placeholder="Paste job description..."
-      value={jobDesc}
-      onChange={(e) => setJobDesc(e.target.value)}
-    />
-  </div>
-
-</div>
-
-  {/* BUTTON */}
-  <button
-    onClick={handleProcess}
-    disabled={loading}
-    className="mt-8 px-8 py-3 bg-cyan-400 text-black font-bold rounded-xl hover:shadow-[0_0_25px_cyan] transition"
-  >
-    {loading ? "Analyzing..." : "Analyze with AI"}
-  </button>
-
-  {/* OUTPUT */}
- {output && (
-  <div
-    className="mt-10 w-full max-w-2xl bg-white/5 border border-cyan-400/20 rounded-2xl p-6 backdrop-blur-lg"
-    style={{ color: "#ffffff" }}
-  >
-
-    <h2 className="text-xl font-bold text-center mb-4" style={{ color: "#ffffff" }}>
-      AI Result
-    </h2>
-
-    <p className="text-center mb-6 leading-relaxed" style={{ color: "#ffffff" }}>
-      {output.summary}
-    </p>
-
-    <div className="text-center mb-6">
-      <span style={{ color: "#ffffff" }}>Match Score:</span>{" "}
-      <span className="font-bold text-2xl" style={{ color: "#ffffff" }}>
-        {output.match}
-      </span>
-    </div>
-
-    <div className="grid md:grid-cols-2 gap-4">
-
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h3 className="mb-2 font-semibold" style={{ color: "#ffffff" }}>
-          Strengths
-        </h3>
-        <ul className="list-disc ml-5 space-y-1">
-          {output.strengths.map((s, i) => (
-            <li key={i} style={{ color: "#ffffff" }}>
-              {s}
-            </li>
-          ))}
-        </ul>
+      {/* TOP HEADER */}
+      <div className="w-full px-6 py-3 bg-white/5 border-b border-white/10 backdrop-blur-xl">
+        <h1 className="text-xl font-bold tracking-wide text-blue-400">
+          AI Resume Analyzer
+        </h1>
       </div>
 
-      <div className="bg-black/20 p-4 rounded-lg">
-        <h3 className="mb-2 font-semibold" style={{ color: "#ffffff" }}>
-          Improvements
-        </h3>
-        <ul className="list-disc ml-5 space-y-1">
-          {output.improvements.map((s, i) => (
-            <li key={i} style={{ color: "#ffffff" }}>
-              {s}
-            </li>
-          ))}
-        </ul>
+      {/* MAIN LAYOUT */}
+      <div className="flex flex-1 overflow-hidden">
+
+        {/* LEFT SIDEBAR */}
+        <div
+          className={`transition-all duration-300 
+          ${sidebarOpen ? "w-72" : "w-20"}
+          bg-white/5 backdrop-blur-xl border-r border-white/10 flex flex-col`}
+        >
+
+          {/* SIDEBAR TOP */}
+          <div className="p-4 flex items-center justify-between">
+            <h1 className={`font-bold text-lg ${!sidebarOpen && "hidden"}`}>
+              History
+            </h1>
+
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="text-xs bg-white/10 px-2 py-1 rounded"
+            >
+              {sidebarOpen ? "⟨" : "⟩"}
+            </button>
+          </div>
+
+          {/* HISTORY LIST */}
+          <div className="flex-1 overflow-y-auto px-2 space-y-2">
+            {history.map((h) => (
+              <div
+                key={h.id}
+                onClick={() => setActiveChat(h)}
+                className={`p-3 rounded-xl cursor-pointer transition-all flex items-center
+                  ${
+                    activeChat?.id === h.id
+                      ? "bg-blue-600/30 border border-blue-500 text-blue-300"
+                      : "bg-white/5 hover:bg-white/10"
+                  }`}
+              >
+                <span>{sidebarOpen ? h.title : "💬"}</span>
+
+                {activeChat?.id === h.id && (
+                  <span className="ml-auto text-blue-400">●</span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* SIDEBAR BOTTOM */}
+          <div className="p-3 space-y-2">
+            <button className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition">
+              Settings
+            </button>
+            <button className="w-full py-2 rounded-lg bg-red-600 hover:bg-red-500">
+              Logout
+            </button>
+            <button className="w-full py-2 rounded-lg bg-red-800 hover:bg-red-700 text-sm">
+              Logout All Devices
+            </button>
+          </div>
+        </div>
+
+        {/* CENTER CHAT AREA */}
+        <div className="flex-1 flex flex-col p-6">
+
+          {/* HEADER */}
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold">
+              {"AI Resume Analyzer"}
+            </h2>
+          </div>
+
+          {/* CHAT WINDOW */}
+          <div className="flex-1 rounded-2xl bg-white/5 border border-white/10 p-5 overflow-y-auto shadow-lg">
+            {activeChat ? (
+              <div className="text-gray-300">
+                <p>Welcome to: {activeChat.title}</p>
+                <p className="mt-2 text-sm text-gray-500">
+                  (Chat messages will appear here)
+                </p>
+              </div>
+            ) : (
+              <p className="text-gray-500">No chat selected</p>
+            )}
+          </div>
+
+          {/* INPUT FIELDS */}
+          <div className="mt-4 grid grid-cols-3 gap-3">
+            <input
+              name="f1"
+              value={form.f1}
+              onChange={handleChange}
+              placeholder="Message 1"
+              className="p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-blue-500"
+            />
+            <input
+              name="f2"
+              value={form.f2}
+              onChange={handleChange}
+              placeholder="Message 2"
+              className="p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-blue-500"
+            />
+            <input
+              name="f3"
+              value={form.f3}
+              onChange={handleChange}
+              placeholder="Message 3"
+              className="p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        {/* RIGHT DASHBOARD */}
+        <div className="w-80 p-5 bg-white/5 backdrop-blur-xl border-l border-white/10">
+
+          {/* USER CARD */}
+          <div className="bg-white/5 rounded-2xl p-4 flex items-center gap-4">
+            <img
+              src="https://i.pravatar.cc/100?img=5"
+              className="w-14 h-14 rounded-full border border-white/20"
+              alt="user"
+            />
+            <div>
+              <h2 className="font-semibold">Juel Rana</h2>
+              <p className="text-sm text-gray-400">CSE Student</p>
+            </div>
+          </div>
+
+          {/* STATS */}
+          <div className="mt-6 space-y-3">
+            <div className="p-4 rounded-xl bg-gradient-to-r from-purple-600/30 to-blue-600/20">
+              ⚡ Total Chats: 24
+            </div>
+            <div className="p-4 rounded-xl bg-gradient-to-r from-green-600/30 to-blue-600/20">
+              📊 Active Sessions: 3
+            </div>
+            <div className="p-4 rounded-xl bg-gradient-to-r from-pink-600/30 to-purple-600/20">
+              🚀 Performance: 92%
+            </div>
+          </div>
+
+          {/* TIP CARD */}
+          <div className="mt-6 p-4 rounded-2xl bg-white/10 border border-white/10">
+            <p className="text-sm text-gray-300">
+              💡 Tip: Analyze resumes to get better job recommendations
+            </p>
+          </div>
+        </div>
       </div>
-
     </div>
-
-  </div>
-)}
-
-</div>
   );
-};
-
-export default Home;
+}
