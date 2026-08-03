@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { loginUser, userRegister, logOutUser, logOutAllDevices, refresh, verifyEmail, forgetPassword, resetPassword } from '../controllers/auth.controller.js';
+import { loginUser, userRegister, getME, logOutUser, logOutAllDevices, refresh, verifyEmail, forgetPassword, resetPassword } from '../controllers/auth.controller.js';
 import { isAuthenticated } from '../middleware/auth.middleware.js';
 
 const router = Router()
@@ -26,6 +26,14 @@ router.post('/verify-email', verifyEmail)
  *@access public 
  */
 router.post('/login', loginUser)
+
+
+/**
+ * @API Get api/v1/auth/me
+ * @description Get the current user's information
+ *@access public 
+ */
+router.get('/me', isAuthenticated, getME);
 
 /**
  * @API POST api/v1/auth/logout
