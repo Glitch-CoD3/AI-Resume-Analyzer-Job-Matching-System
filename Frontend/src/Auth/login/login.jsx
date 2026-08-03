@@ -1,43 +1,46 @@
 import React, { useState } from "react";
 import "./login.css";
-import { Link, useNavigate } from "react-router-dom"; // Added for navigation
-import AxiosInstance from '../../api/axiosInstance.jsx'; // Import your axios instance
+import { Link, useNavigate } from "react-router-dom";
+import AxiosInstance from '../../api/axiosInstance.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const Login = () => {
-  const navigate = useNavigate(); // Hook for redirection
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const navigate = useNavigate();
+
+  const { checkAuthStatus } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setLoading(true);
 
     try {
-      // 1. Call your actual backend endpoint
-      const response = await AxiosInstance.post("auth/login", {
-        email: form.email,
-        password: form.password,
+      // 1. Call login API
+      await AxiosInstance.post('/auth/login', {
+        email,
+        password,
       });
 
+      // 2. Check authentication status
+      const authenticated = await checkAuthStatus();
 
-      alert("Login Successful!");
-
-      // 3. Navigate to Home or Dashboard
-      navigate("/home"); 
+      // 3. Navigate to home if authenticated
+      if (authenticated) {
+        navigate('/home', {
+          replace: true,
+        });
+      }
 
     } catch (error) {
-      // 4. Handle Errors (Wrong password, user doesn't exist, etc.)
-      const errorMsg = error.response?.data?.message || "Login failed. Please try again.";
-      alert(errorMsg);
-      console.error("Login Error:", error);
+      console.error(
+        'Login error:',
+        error.response?.data || error.message
+      );
+
     } finally {
       setLoading(false);
     }
@@ -50,12 +53,13 @@ const Login = () => {
         <p>Login to your account</p>
 
         <form onSubmit={handleSubmit}>
+
           <div className="inputBox">
             <input
               type="email"
               name="email"
-              value={form.email}
-              onChange={handleChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
             <label>Email Address</label>
@@ -65,8 +69,8 @@ const Login = () => {
             <input
               type="password"
               name="password"
-              value={form.password}
-              onChange={handleChange}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
             <label>Password</label>
@@ -74,19 +78,29 @@ const Login = () => {
 
           <div className="options">
             <label>
-              <input type="checkbox" /> Remember me
+              <input type="checkbox" />
+              Remember me
             </label>
-            {/* Forgot password usually links to a separate route */}
-            <Link to="/forgot-password">Forgot Password?</Link>
+
+            <Link to="/forgot-password">
+              Forgot Password?
+            </Link>
           </div>
 
-          <button type="submit" disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+          >
             {loading ? "Logging in..." : "Login"}
           </button>
 
           <p className="register">
-            Don’t have an account? <Link to="/register">Register</Link>
+            Don’t have an account?{" "}
+            <Link to="/register">
+              Register
+            </Link>
           </p>
+
         </form>
       </div>
     </div>
