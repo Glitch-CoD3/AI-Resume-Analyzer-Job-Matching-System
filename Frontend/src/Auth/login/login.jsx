@@ -27,10 +27,6 @@ const Login = () => {
         password: form.password,
       });
 
-      console.log("Login Success:", response.data);
-      
-      // 2. Optional: Save token if your backend provides one
-      // localStorage.setItem("token", response.data.token);
 
       alert("Login Successful!");
 

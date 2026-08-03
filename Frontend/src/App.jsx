@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Register from './Auth/register/Register';
 import Login from './Auth/login/Login'; // Import your new Login page
-import Home from './Auth/Home/home';
 import NotFound from './pages/notFoundPage/notFoundPage.jsx';
 import ForgotPassword from './Auth/forgotPass/forgotPassword.jsx';
 import ResetPassword from './Auth/setNewPassword/setNewPassword.jsx';
 import OtpVerification from './Auth/OTP/otp.jsx';
+import HomePage from './Auth/Home/home.jsx';
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/OtpVerification" element={<OtpVerification />} />

@@ -1,6 +1,8 @@
 import { InterviewReport } from "../models/interviewReport.models.js";
 import { generateInterviewReport } from "../services/ai.service.js";
 import { createRequire } from "module";
+import mongoose from "mongoose";
+import { History } from "../models/history.models.js";
 
 const require = createRequire(import.meta.url);
 const pdfParse = require("pdf-parse");
@@ -28,46 +30,20 @@ export const sanitizeAiResponse = (data) => {
     }
     return obj;
 };
+;
 
 export const generateInterViewReportController = async (req, res) => {
     try {
-        // ✅ 1. Validate input
-        // if (!req.file) {
-        //     return res.status(400).json({ message: "Resume PDF is required" });
-        // }
+        const userId = req.user?._id || req.userId;
 
+        const { resume, selfdescribe, jobdescribe } = req.body;
+        if (!resume || !selfdescribe || !jobdescribe) {
+            return res.status(400).json({
+                message: "Resume, self-description, and job description are required"
+            });
+        }
 
-        // const { selfDescription, jobDescription } = req.body;
-
-        // if (!selfDescription || !jobDescription) {
-        //     return res.status(400).json({
-        //         message: "selfDescription and jobDescription are required"
-        //     });
-        // }
-
-        // // ✅ 2. Parse PDF
-        // const pdfData = await pdfParse(req.file.buffer);
-        // const resumeText = JSON.stringify(
-        //     pdfData.text
-        //         .replace(/\s+/g, " ")
-        //         .trim()
-        // );
-
-
-
-        // if (!resumeText) {
-        //     throw new Error("Failed to extract text from PDF");
-        // }
-
-        // console.log(resumeText);
-        
-
-       const { resume, selfdescribe, jobdescribe } = req.body;
-            if (!resume || !selfdescribe || !jobdescribe) { 
-                return res.status(400).json({ message: "Resume, self-description, and job description are required" });
-            }
-
-        // ✅ 3. Generate AI report
+        // ✅ 1. Generate AI report
         const report = await generateInterviewReport({
             resume: resume,
             selfdescribe: selfdescribe,
@@ -80,23 +56,36 @@ export const generateInterViewReportController = async (req, res) => {
         if (!sanitizedReport) {
             return res.status(500).json({ message: "Failed to generate interview report" });
         }
-        // ✅ 4. Save to DB
+
+        // ✅ 2. Save Report to DB
         const interviewReport = await InterviewReport.create({
-            user: req.userId,
+            user: userId,
             resumeText: resume,
             selfDescription: selfdescribe,
             jobDescription: jobdescribe,
             ...sanitizedReport
         });
-        
 
-        if(!interviewReport) {
+        if (!interviewReport) {
             return res.status(500).json({ message: "Failed to save interview report" });
         }
+
+        // ✅ 3. Auto-generate title for this specific submission
+        const autoHistoryTitle = jobdescribe
+            ? `Report: ${jobdescribe.trim().slice(0, 30)}...`
+            : `Interview Analysis - ${new Date().toLocaleDateString()}`;
+
+        // ✅ 4. Create a NEW History document for this submission
+        const newHistory = await History.create({
+            userId: userId,
+            historyTitle: autoHistoryTitle,
+            analysisIds: [interviewReport._id]
+        });
 
         // ✅ 5. Response
         return res.status(201).json({
             message: "Interview report generated successfully",
+            history: newHistory,
             interviewReport
         });
 
@@ -106,6 +95,38 @@ export const generateInterViewReportController = async (req, res) => {
         return res.status(500).json({
             message: "Failed to generate interview report",
             error: error.message
+        });
+    }
+};
+
+/**
+ * @desc    Fetch a single InterviewReport directly by report ID
+ * @route   GET /api/v1/reports/:reportId
+ * @access  Private
+ */
+export const getReportById = async (req, res) => {
+    try {
+        const { reportId } = req.params;
+        const userId = req.userId;
+
+        const report = await InterviewReport.findOne({ _id: reportId, user: userId });
+
+        if (!report) {
+            return res.status(404).json({
+                success: false,
+                message: "Report not found or unauthorized",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: report,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch report",
+            error: error.message,
         });
     }
 };

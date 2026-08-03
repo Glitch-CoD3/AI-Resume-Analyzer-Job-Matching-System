@@ -1,4 +1,6 @@
 import { User } from '../models/user.models.js';
+import mongoose from 'mongoose';
+import { InterviewReport } from '../models/interviewReport.models.js';
 // import { tokenBlacklist } from '../models/blacklist.models.js';
 import { Session } from '../models/session.models.js';
 import { sendEmail } from '../services/email.js';
@@ -152,8 +154,8 @@ const loginUser = async (req, res) => {
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: "strict",
+            secure: false,
+            sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
@@ -172,6 +174,7 @@ const loginUser = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
 
 
 /**
@@ -216,8 +219,15 @@ const logOutUser = async (req, res) => {
         session.revoked = true;
         await session.save();
 
+        const cookieOptions = {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            maxAge: 0 // Expire immediately
+        };
+
         // Step 8: Clear cookie
-        res.clearCookie("refreshToken");
+        res.clearCookie("refreshToken", cookieOptions);
 
         // Step 9: Success response
         return res.status(200).json({
@@ -256,7 +266,14 @@ const logOutAllDevices = async (req, res) => {
             revoked: true
         })
 
-        res.clearCookie("refreshToken");
+        cookieOptions = {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            maxAge: 0 // Expire immediately
+        };
+
+        res.clearCookie("refreshToken", cookieOptions);
 
         return res.status(200).json({
             message: "User logged out from all devices successfully"
@@ -426,4 +443,7 @@ const resetPassword = async (req, res) => {
     }
 };
 
-export { userRegister, loginUser, logOutUser, logOutAllDevices, refresh, verifyEmail, forgetPassword, resetPassword }
+export { userRegister, loginUser, 
+    logOutUser, 
+    logOutAllDevices, refresh, verifyEmail, 
+    forgetPassword, resetPassword }

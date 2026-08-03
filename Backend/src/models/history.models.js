@@ -9,6 +9,11 @@ const historySchema = new mongoose.Schema(
       unique: true,
     },
 
+    historyTitle: {
+      type: String,
+      default: "User History",
+    },
+
     analysisIds: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -21,6 +26,4 @@ const historySchema = new mongoose.Schema(
   }
 );
 
-const History = mongoose.model("History", historySchema);
-
-export default History;
+export const History = mongoose.model("History", historySchema);

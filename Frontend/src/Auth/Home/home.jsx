@@ -1,23 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import AxiosInstance from "../../api/axiosInstance.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
-  const [activeChat, setActiveChat] = useState(null);
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  const history = [
-    { id: 1, title: "AI Chat System" },
-    { id: 2, title: "Database Design Help" },
-    { id: 3, title: "React UI Fixing" },
-  ];
-
+  const [user, setUser] = useState({ username: "Loading..." });
+  const [activeChat, setActiveChat] = useState(null);
+  const [history, setHistory] = useState([
+    { id: 1, title: "Chat with AI" },
+    { id: 2, title: "Resume Analysis" },
+    { id: 3, title: "Job Recommendations" },
+  ]);
   const [form, setForm] = useState({
     f1: "",
     f2: "",
     f3: "",
   });
-
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await AxiosInstance.get("/dashboard/details", {
+      });
+  
+      if (response) {
+      setUser(response.data);
+      console.log("User details fetched successfully:", response);
+
+      } else {
+        // If the response indicates failure, redirect to login
+        alert("Authentication failed. Please log in again.");
+        navigate("/login");
+      }
+
+    } catch (error) {
+      alert(error.response?.data?.message || error.message);
+    }
+  };
+
+  // 🔥 AUTO CALL AFTER LOGIN / PAGE LOAD
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
 
   return (
     <div className="h-screen w-full flex flex-col bg-[#0b0f1a] text-white overflow-hidden">
@@ -116,24 +144,24 @@ export default function HomePage() {
           {/* INPUT FIELDS */}
           <div className="mt-4 grid grid-cols-3 gap-3">
             <input
-              name="f1"
-              value={form.f1}
+              name="resume"
+              value={form.resume}
               onChange={handleChange}
-              placeholder="Message 1"
+              placeholder="Paste resume here"
               className="p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-blue-500"
             />
             <input
-              name="f2"
-              value={form.f2}
+              name="selfDescribe"
+              value={form.selfDescribe}
               onChange={handleChange}
-              placeholder="Message 2"
+              placeholder="Self-Describe"
               className="p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-blue-500"
             />
             <input
-              name="f3"
-              value={form.f3}
+              name="jobDescription"
+              value={form.jobDescription}
               onChange={handleChange}
-              placeholder="Message 3"
+              placeholder="Paste Job-Description"
               className="p-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -150,8 +178,8 @@ export default function HomePage() {
               alt="user"
             />
             <div>
-              <h2 className="font-semibold">Juel Rana</h2>
-              <p className="text-sm text-gray-400">CSE Student</p>
+              <h2 className="font-semibold">{user.username}</h2>
+              <p className="text-sm text-gray-400">{user.email}</p>
             </div>
           </div>
 

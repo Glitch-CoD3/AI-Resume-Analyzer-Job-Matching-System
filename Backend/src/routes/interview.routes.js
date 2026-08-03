@@ -1,7 +1,9 @@
 import express from 'express';
 import { Router } from 'express';
 import { InterviewReport } from '../models/interviewReport.models.js';
-import { generateInterViewReportController } from '../controllers/interview.controller.js';
+import { generateInterViewReportController,
+    getReportById
+} from '../controllers/interview.controller.js';
 import { isAuthenticated } from '../middleware/auth.middleware.js';
 import { upload } from '../middleware/multer.middleware.js';
 
@@ -15,6 +17,15 @@ const router = express.Router();
  *@access private 
  */
 
-router.post('/', isAuthenticated, upload.single("resume"), generateInterViewReportController)
+router.post('/', isAuthenticated, generateInterViewReportController)
+
+
+/**
+ * @API GET api/v1/reports/:id
+ * @description retrieve interview reports
+ *@access private 
+ */
+
+router.get('/:reportId', isAuthenticated, getReportById)
 
 export default router;
