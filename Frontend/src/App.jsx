@@ -5,7 +5,7 @@ import NotFound from './pages/notFoundPage/notFoundPage.jsx';
 import ForgotPassword from './Auth/forgotPass/forgotPassword.jsx';
 import ResetPassword from './Auth/setNewPassword/setNewPassword.jsx';
 import OtpVerification from './Auth/OTP/otp.jsx';
-import HomePage from './Auth/Home/home.jsx';
+import HomePage from './pages/Home/home.jsx'; // Import your Home page
 
 function App() {
   return (
