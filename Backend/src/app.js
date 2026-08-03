@@ -14,6 +14,7 @@ app.use(
   })
 );
 
+app.use(express.static('public'));
 
 import authRoutes from './routes/auth.routes.js'
 app.use('/api/v1/auth', authRoutes)

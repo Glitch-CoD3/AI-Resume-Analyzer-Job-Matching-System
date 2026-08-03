@@ -10,7 +10,8 @@ export default function AnalysisForm({ form, handleChange, handleSubmit, isSubmi
           rows={2}
           value={form.resume}
           onChange={handleChange}
-          placeholder="Paste resume here *"
+          placeholder="Paste Resume Details
+(skills & projects) "
           disabled={isSubmitting}
           className="p-3 rounded-xl bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 resize-none"
         />
