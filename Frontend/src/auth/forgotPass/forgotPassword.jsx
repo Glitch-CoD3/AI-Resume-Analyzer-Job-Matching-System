@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./forgotPassword.css";
+import './forgotpassword.css';
 import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import AxiosInstance from '../../api/axiosInstance.jsx';
 
