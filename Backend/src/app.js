@@ -8,9 +8,16 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 
+const allowedOrigins = process.env.CLIENT_URI.split(",");
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URI,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
