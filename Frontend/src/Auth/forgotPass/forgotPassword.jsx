@@ -3,7 +3,7 @@ import "./forgotPassword.css";
 import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import AxiosInstance from '../../api/axiosInstance.jsx';
 
-const ForgotPassword = () => {
+const forgotPassword = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // Initialize navigate
@@ -64,4 +64,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default forgotPassword;

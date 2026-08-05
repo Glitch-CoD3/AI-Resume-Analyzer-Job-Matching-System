@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import AxiosInstance from '../../api/axiosInstance.jsx'
 
-const Register = () => {
+const register = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -122,4 +122,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default register;

@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AxiosInstance from '../../api/axiosInstance.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
-const Login = () => {
+const login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -107,4 +107,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default login;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AxiosInstance from '../../api/axiosInstance.jsx';
 
-const ResetPassword = () => {
+const resetPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -81,4 +81,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default resetPassword;
