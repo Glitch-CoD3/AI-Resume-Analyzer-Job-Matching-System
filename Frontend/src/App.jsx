@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
-import { GuestRoute, ProtectedRoute } from './routes/ProtectedRoute.jsx';
+import { GuestRoute, ProtectedRoute } from './routes/protectedRoute.jsx'
 
 import register from './auth/register/register.jsx';
 import login from './auth/login/login.jsx'
