@@ -8,8 +8,9 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  process.env.CLIENT_URI
+  process.env.CLIENT_URI,
+  "http://localhost:5173"
+  
 ];
 
 app.use(
