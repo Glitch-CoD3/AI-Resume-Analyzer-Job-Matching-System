@@ -3,7 +3,7 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { GuestRoute, ProtectedRoute } from './routes/ProtectedRoute.jsx';
 
 import Register from './auth/register/Register.jsx';
-import Login from './auth/login/Login.jsx';
+import Login from './auth/login/login.jsx';
 import NotFound from './pages/notFoundPage/notFoundPage.jsx';
 import ForgotPassword from './auth/forgotPass/forgotPassword.jsx';
 import ResetPassword from './auth/setnewpassword/setNewPassword.jsx';
