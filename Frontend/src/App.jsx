@@ -7,7 +7,7 @@ import login from './auth/login/login.jsx';
 import NotFound from './pages/notFoundPage/notFoundPage.jsx';
 import forgotPassword from './auth/forgotPass/forgotPassword.jsx';
 import resetPassword from './auth/setnewpassword/setNewPassword.jsx';
-import OtpVerification from './auth/otpVerification/otpVerification.jsx';
+import OtpVerification from './auth/otp/otp.jsx';
 import HomePage from './pages/Home/home.jsx';
 
 function App() {
@@ -17,11 +17,11 @@ function App() {
         <Routes>
           {/* Guest-Only Routes: Redirects to /home if authenticated */}
           <Route element={<GuestRoute />}>
-            <Route path="/" element={<Login />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/" element={<login />} />
+            <Route path="/login" element={<login />} />
+            <Route path="/register" element={<register />} />
+            <Route path="/forgot-password" element={<forgotPassword />} />
+            <Route path="/reset-password" element={<resetPassword />} />
             <Route path="/OtpVerification" element={<OtpVerification />} />
           </Route>
 
