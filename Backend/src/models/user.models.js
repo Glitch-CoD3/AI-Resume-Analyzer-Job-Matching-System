@@ -12,6 +12,12 @@ const userSchema = new Schema({
         required: [true, 'Email is required'],
         unique: [true, 'Email must be unique']
     },
+
+    avatar: {
+        type: String,
+        default: null
+    },
+
     password: {
         type: String,
         required: [true, 'Password is required'],

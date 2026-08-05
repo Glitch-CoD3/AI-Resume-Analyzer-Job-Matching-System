@@ -1,8 +1,14 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../middleware/auth.middleware.js';
-import { getUserHistory, getDashboardAnalytics, getDashboardDetails } from '../controllers/dashboard.controller.js';
-
+import { getUserHistory, getDashboardAnalytics, getDashboardDetails, updateUserAvatar } from '../controllers/dashboard.controller.js';
+import { upload } from '../middleware/multer.middleware.js';
 const router = Router()
+
+router.put(
+    "/avatar", isAuthenticated,
+    upload.single("image"),
+    updateUserAvatar
+);
 /**
  * @API GET api/v1/dashboard/history
  * @description Get user history
@@ -24,7 +30,7 @@ router.get('/analytics', isAuthenticated, getDashboardAnalytics)
  *@access Private 
  */
 
- 
+
 router.get('/details', isAuthenticated, getDashboardDetails)
 
-export default router ;
+export default router;

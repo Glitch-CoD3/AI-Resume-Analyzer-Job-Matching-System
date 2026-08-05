@@ -3,6 +3,7 @@ import { InterviewReport } from "../models/interviewReport.models.js";
 import { User } from "../models/user.models.js";
 import { Session } from "../models/session.models.js";
 import mongoose from 'mongoose';
+import { uploadAvatarToCloudinary, deleteAvatarFromCloudinary } from "../utils/cloudinary.js";
 
 /**
  * @desc    Get user history log with populated report details
@@ -190,6 +191,73 @@ export const getDashboardDetails = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch dashboard details",
+      error: error.message,
+    });
+  }
+};
+
+
+/**
+ * @desc    Update user avatar
+ * @route   PUT /api/v1/dashboard/avatar
+ * @access  Private
+ */
+export const updateUserAvatar = async (req, res) => {
+  try {
+    const avatarLocalPath = req.file?.path;
+
+    if (!avatarLocalPath) {
+      return res.status(400).json({
+        success: false,
+        message: "No avatar file provided",
+      });
+    }
+
+    // Get current user
+    const existingUser = await User.findById(req.userId);
+
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Upload new avatar
+    const uploadedAvatar = await uploadAvatarToCloudinary(avatarLocalPath);
+
+    if (!uploadedAvatar?.url) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to upload avatar",
+      });
+    }
+
+    // Delete old avatar (if exists)
+    if (existingUser.avatar) {
+      await deleteAvatarFromCloudinary(existingUser.avatar);
+    }
+
+    // Update user
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.userId },
+      {
+        $set: {
+          avatar: uploadedAvatar.url,
+        },
+      },
+      { returnDocument: "after" }
+    ).select("-password");
+
+    return res.status(200).json({
+      success: true,
+      message: "Avatar updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update avatar",
       error: error.message,
     });
   }
