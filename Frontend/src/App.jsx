@@ -2,12 +2,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext.jsx';
 import { GuestRoute, ProtectedRoute } from './routes/ProtectedRoute.jsx';
 
-import register from './auth/register/register.jsx';
-import login from './auth/login/login.jsx'
+import register from './auth_temp/register/register.jsx';
+import login from './auth_temp/login/login.jsx'
 import NotFound from './pages/notFoundPage/notFoundPage.jsx';
-import forgotPassword from './auth/forgotPass/forgotPassword.jsx';
-import resetPassword from './auth/setnewpassword/setNewPassword.jsx';
-import OtpVerification from './auth/otp/otp.jsx';
+import forgotPassword from './auth_temp/forgotPass/forgotPassword.jsx';
+import resetPassword from './auth_temp/setnewpassword/setNewPassword.jsx';
+import OtpVerification from './auth_temp/otp/otp.jsx';
 import HomePage from './pages/Home/home.jsx';
 
 function App() {
