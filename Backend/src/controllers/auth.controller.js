@@ -154,9 +154,9 @@ const loginUser = async (req, res) => {
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            secure: true,
+            sameSite: "None",
+            path: "/",
         });
 
 
@@ -182,7 +182,7 @@ const loginUser = async (req, res) => {
  */
 
 const getME = async (req, res) => {
-   try {
+    try {
         const user = await User.findById(req.userId).select('-password');
 
         if (!user) {
@@ -469,7 +469,9 @@ const resetPassword = async (req, res) => {
     }
 };
 
-export { userRegister, loginUser, 
+export {
+    userRegister, loginUser,
     logOutUser, getME,
-    logOutAllDevices, refresh, verifyEmail, 
-    forgetPassword, resetPassword }
+    logOutAllDevices, refresh, verifyEmail,
+    forgetPassword, resetPassword
+}
