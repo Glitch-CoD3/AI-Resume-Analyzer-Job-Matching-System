@@ -1,6 +1,6 @@
 import axios from "axios";
 const AxiosInstance = axios.create({
-  baseURL:"http://localhost:3000/api/v1",
+  baseURL:"https://ai-backend-peach.vercel.app/api/v1",
   timeout: 60000,
   withCredentials: true, // Include credentials (cookies) in requests
 });
