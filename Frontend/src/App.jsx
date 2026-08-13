@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext.jsx';
 import { GuestRoute, ProtectedRoute } from './routes/protectedRoute.jsx'
 
-import register from './auth/register/register.jsx';
-import login from './auth/login/login.jsx'
+import Register from './auth/register/register.jsx';
+import Login from './auth/login/Login.jsx'
 import NotFound from './pages/notFoundPage/notFoundPage.jsx';
 import forgotPassword from './auth/forgotPass/forgotPassword.jsx';
 import resetPassword from './auth/setnewpassword/setNewPassword.jsx';
@@ -17,9 +17,9 @@ function App() {
         <Routes>
           {/* Guest-Only Routes: Redirects to /home if authenticated */}
           <Route element={<GuestRoute />}>
-            <Route path="/" element={<login />} />
-            <Route path="/login" element={<login />} />
-            <Route path="/register" element={<register />} />
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<forgotPassword />} />
             <Route path="/reset-password" element={<resetPassword />} />
             <Route path="/OtpVerification" element={<OtpVerification />} />

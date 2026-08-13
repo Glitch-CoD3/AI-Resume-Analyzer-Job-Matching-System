@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useRef } from "react";
 import AxiosInstance from "../api/axiosInstance.jsx";
-import { useRef } from "react";
 
 export default function RightPanel({ user, totalReports, activeSessionsCount }) {
   const fileInputRef = useRef(null);
@@ -28,10 +27,7 @@ export default function RightPanel({ user, totalReports, activeSessionsCount }) 
       );
 
       if (data.success) {
-        // Refresh the page or call your fetchUser/AuthContext here
         window.location.reload();
-        // OR:
-        // await fetchUser();
       }
     } catch (error) {
       console.error("Avatar upload failed:", error);
@@ -48,11 +44,19 @@ export default function RightPanel({ user, totalReports, activeSessionsCount }) 
           <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-cyan-500/20 rounded-full blur-3xl" />
 
           <div className="relative flex flex-col items-center text-center">
+            {/* HIDDEN FILE INPUT (ADDED HERE) */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleAvatarUpload}
+              accept="image/*"
+              className="hidden"
+            />
+
             <div
               onClick={handleAvatarClick}
               className="relative group cursor-pointer"
             >
-
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-500 via-pink-500 to-cyan-400 animate-spin [animation-duration:8s]"></div>
 
               <div className="relative p-1 rounded-full bg-slate-900">
@@ -62,19 +66,17 @@ export default function RightPanel({ user, totalReports, activeSessionsCount }) 
                     `https://api.dicebear.com/7.x/bottts/svg?seed=${user.username}`
                   }
                   className="w-28 h-28 rounded-full object-cover"
+                  alt="Avatar"
                 />
               </div>
 
               <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-400 rounded-full border-4 border-slate-900 animate-pulse"></div>
 
               <div className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-
                 <div className="px-3 py-1 rounded-full bg-white/20 backdrop-blur text-white text-sm">
                   📷 Change
                 </div>
-
               </div>
-
             </div>
 
             <h2 className="mt-4 text-lg font-bold text-white truncate w-full">

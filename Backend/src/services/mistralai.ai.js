@@ -1,13 +1,8 @@
-import { GoogleGenAI } from "@google/genai";
+import { ChatMistralAI } from "@langchain/mistralai";
 import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
 
 const interviewReportZodSchema = z.object({
-  summary: z.string(),
+  summary: z.string().describe("Professional 3-line evaluation"),
 
   strengths: z.array(z.string()),
   resumeIssues: z.array(z.string()),
@@ -69,9 +64,19 @@ const interviewReportZodSchema = z.object({
   atsScore: z.number().min(0).max(100),
 });
 
-export async function generateInterviewReport({ resume, selfdescribe, jobdescribe }) {
+export async function generateInterviewReportMis({ resume, selfdescribe, jobdescribe }) {
+  // Initialize the ChatMistralAI model
+  const model = new ChatMistralAI({
+    apiKey: process.env.MISTRALAI_API_KEY,
+    model: "mistral-small-latest",
+    temperature: 0.2, // Lower temperature for more consistent structured outputs
+  });
+
+  // Bind the Zod schema directly to the model
+  const structuredModel = model.withStructuredOutput(interviewReportZodSchema);
+
   const prompt = `
-Act as a Senior Technical Interviewer. Analyze the provided data to generate a comprehensive Career Report matching the required JSON schema.
+Act as a Senior Technical Interviewer. Analyze the provided data to generate a comprehensive Career Report.
 
 🎯 ANALYSIS CRITERIA:
 1. summary: Professional 3-line evaluation.
@@ -93,34 +98,15 @@ Self-Bio: ${selfdescribe}
 `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        // Convert Zod schema to OpenAPI 3.0-compliant JSON Schema for Gemini
-        responseSchema: zodToJsonSchema(interviewReportZodSchema, {
-          target: "openApi3",
-        }),
-      },
-    });
-
-    if (response?.text) {
-      // Safely parse JSON output guaranteed by Gemini structured outputs
-      const parsedData = JSON.parse(response.text);
-      
-      // Optional: Validate with Zod to ensure type safety in TypeScript
-      return interviewReportZodSchema.parse(parsedData);
-    }
-
-    console.warn("AI response was empty.");
-    return null;
+    // Returns the fully parsed JavaScript object conforming to interviewReportZodSchema
+    const report = await structuredModel.invoke(prompt);
+    return report;
   } catch (error) {
-    console.error("--- AI SERVICE ERROR ---");
+    console.error("--- LANGCHAIN MISTRAL SERVICE ERROR ---");
     console.error("Message:", error.message);
 
-    if (error.message?.includes("503") || error.message?.includes("high demand")) {
-      console.warn("Server busy: High demand spike.");
+    if (error.message?.includes("429") || error.message?.includes("rate limit")) {
+      console.warn("Rate limit exceeded or high server demand.");
     }
 
     return null;

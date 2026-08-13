@@ -33,6 +33,22 @@ export default function ReportDisplay({ loadingReport, isNewReportMode, activeRe
 
     return (
         <div className="space-y-6">
+            {/* SCORES SUMMARY BANNER */}
+            <div className="grid grid-cols-3 gap-3">
+                <div className="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                    <span className="text-xs text-gray-400 block">Overall Score</span>
+                    <span className="text-xl font-bold text-blue-400">{activeReport.overallScore ?? 0}%</span>
+                </div>
+                <div className="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                    <span className="text-xs text-gray-400 block">Match Score</span>
+                    <span className="text-xl font-bold text-emerald-400">{activeReport.matchScore ?? 0}%</span>
+                </div>
+                <div className="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                    <span className="text-xs text-gray-400 block">ATS Score</span>
+                    <span className="text-xl font-bold text-purple-400">{activeReport.atsScore ?? 0}%</span>
+                </div>
+            </div>
+
             {/* 1. EXECUTIVE SUMMARY */}
             <div className="bg-white/5 p-4 rounded-xl border border-white/10">
                 <h3 className="text-lg font-semibold text-blue-400 mb-2">
@@ -62,7 +78,7 @@ export default function ReportDisplay({ loadingReport, isNewReportMode, activeRe
             {/* 3. KEYWORD ANALYSIS */}
             <div className="bg-white/5 p-4 rounded-xl border border-white/10">
                 <h3 className="text-lg font-semibold text-purple-400 mb-2">
-                    Keyword Analysis
+                    Keyword Analysis ({activeReport.keywordAnalysis?.keywordMatchPercentage ?? 0}% Match)
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
@@ -118,6 +134,23 @@ export default function ReportDisplay({ loadingReport, isNewReportMode, activeRe
                 )}
             </div>
 
+            {/* RESUME REWRITE EXAMPLE */}
+            {activeReport.resumeRewrite && (
+                <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                    <h3 className="text-lg font-semibold text-teal-400 mb-2">
+                        Resume Bullet Rewrite Example
+                    </h3>
+                    <div className="space-y-2 text-sm">
+                        <p className="text-red-300 line-through bg-red-500/10 p-2 rounded border border-red-500/20">
+                            <strong>Before:</strong> {activeReport.resumeRewrite.before}
+                        </p>
+                        <p className="text-emerald-300 bg-emerald-500/10 p-2 rounded border border-emerald-500/20">
+                            <strong>After:</strong> {activeReport.resumeRewrite.after}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {/* 5. SKILL GAPS */}
             <div className="bg-white/5 p-4 rounded-xl border border-white/10">
                 <h3 className="text-lg font-semibold text-amber-400 mb-2">
@@ -126,7 +159,14 @@ export default function ReportDisplay({ loadingReport, isNewReportMode, activeRe
                 {activeReport.skillGaps?.length > 0 ? (
                     <ul className="list-disc list-inside space-y-1.5 text-sm text-gray-300">
                         {activeReport.skillGaps.map((gap, index) => (
-                            <li key={index}>{gap}</li>
+                            <li key={index}>
+                                <strong>{gap.skill || gap}</strong>
+                                {gap.severity && (
+                                    <span className="ml-2 text-xs uppercase px-1.5 py-0.5 bg-amber-500/20 text-amber-300 rounded border border-amber-500/30">
+                                        {gap.severity}
+                                    </span>
+                                )}
+                            </li>
                         ))}
                     </ul>
                 ) : (
@@ -158,7 +198,10 @@ export default function ReportDisplay({ loadingReport, isNewReportMode, activeRe
                 {activeReport.preparationPlan?.length > 0 ? (
                     <ul className="list-disc list-inside space-y-1.5 text-sm text-gray-300">
                         {activeReport.preparationPlan.map((step, index) => (
-                            <li key={index}>{step}</li>
+                            <li key={index}>
+                                {step.day ? <strong>Day {step.day} ({step.focus}): </strong> : null}
+                                {step.task || step}
+                            </li>
                         ))}
                     </ul>
                 ) : (
@@ -174,7 +217,15 @@ export default function ReportDisplay({ loadingReport, isNewReportMode, activeRe
                 {activeReport.learningRoadmap?.length > 0 ? (
                     <ul className="list-disc list-inside space-y-1.5 text-sm text-gray-300">
                         {activeReport.learningRoadmap.map((item, index) => (
-                            <li key={index}>{item}</li>
+                            <li key={index}>
+                                <strong>{item.skill || item}</strong>
+                                {item.priority && (
+                                    <span className="ml-2 text-xs uppercase px-1.5 py-0.5 bg-cyan-500/20 text-cyan-300 rounded border border-cyan-500/30">
+                                        {item.priority} priority
+                                    </span>
+                                )}
+                                {item.reason && <p className="text-xs text-gray-400 ml-5">{item.reason}</p>}
+                            </li>
                         ))}
                     </ul>
                 ) : (
@@ -188,9 +239,21 @@ export default function ReportDisplay({ loadingReport, isNewReportMode, activeRe
                     Technical Questions ({activeReport.technicalQuestions?.length || 0})
                 </h3>
                 {activeReport.technicalQuestions?.length > 0 ? (
-                    <ul className="list-disc list-inside space-y-1.5 text-sm text-gray-300">
+                    <ul className="list-disc list-inside space-y-3 text-sm text-gray-300">
                         {activeReport.technicalQuestions.map((q, index) => (
-                            <li key={index}>{q}</li>
+                            <li key={index}>
+                                <strong>{q.question || q}</strong>
+                                {q.intention && (
+                                    <p className="text-xs text-gray-400 ml-5">
+                                        <em>Intention:</em> {q.intention}
+                                    </p>
+                                )}
+                                {q.answer && (
+                                    <p className="text-xs text-gray-300 ml-5 bg-black/20 p-1.5 rounded mt-1">
+                                        <em>Suggested Answer:</em> {q.answer}
+                                    </p>
+                                )}
+                            </li>
                         ))}
                     </ul>
                 ) : (
@@ -204,9 +267,21 @@ export default function ReportDisplay({ loadingReport, isNewReportMode, activeRe
                     Behavioral Questions ({activeReport.behavioralQuestions?.length || 0})
                 </h3>
                 {activeReport.behavioralQuestions?.length > 0 ? (
-                    <ul className="list-disc list-inside space-y-1.5 text-sm text-gray-300">
+                    <ul className="list-disc list-inside space-y-3 text-sm text-gray-300">
                         {activeReport.behavioralQuestions.map((q, index) => (
-                            <li key={index}>{q}</li>
+                            <li key={index}>
+                                <strong>{q.question || q}</strong>
+                                {q.intention && (
+                                    <p className="text-xs text-gray-400 ml-5">
+                                        <em>Intention:</em> {q.intention}
+                                    </p>
+                                )}
+                                {q.answer && (
+                                    <p className="text-xs text-gray-300 ml-5 bg-black/20 p-1.5 rounded mt-1">
+                                        <em>Suggested Answer:</em> {q.answer}
+                                    </p>
+                                )}
+                            </li>
                         ))}
                     </ul>
                 ) : (
