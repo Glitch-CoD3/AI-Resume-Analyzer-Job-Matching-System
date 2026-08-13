@@ -11,23 +11,26 @@ app.use(cookieParser())
 
 const allowedOrigins = [
   'https://ai-frontend-eta-henna.vercel.app',
-  'http://localhost:5173' // Optional: include your local dev server port (e.g. 3000 or 5173)
+  'http://localhost:5173'
 ];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
-      // or if origin is in the allowed origins array
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
+// 1. Apply CORS middleware to all incoming requests
+app.use(cors(corsOptions));
+
+// 2. Handle preflight (OPTIONS) requests using the modern regex syntax
+app.options(/(.*)/, cors(corsOptions));
 
 
 import authRoutes from './routes/auth.routes.js'
