@@ -9,15 +9,20 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 
-const allowedOrigins = process.env.CLIENT_URI.split(",");
+const allowedOrigins = [
+  'https://ai-frontend-eta-henna.vercel.app',
+  'http://localhost:5173' // Optional: include your local dev server port (e.g. 3000 or 5173)
+];
 
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+      // or if origin is in the allowed origins array
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      callback(new Error("Not allowed by CORS"));
+      return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
