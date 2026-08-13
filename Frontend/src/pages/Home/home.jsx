@@ -9,8 +9,12 @@ import AnalysisForm from "../../components/AnalysisForm.jsx";
 import RightPanel from "../../components/RightPanel.jsx";
 
 export default function HomePage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Default sidebars based on window screen width (Closed by default on mobile < 768px)
+  const [sidebarOpen, setSidebarOpen] = useState(
+    typeof window !== "undefined" ? window.innerWidth >= 768 : true
+  );
   const [rightPanelOpen, setRightPanelOpen] = useState(false); // Closed by default
+
   const [user, setUser] = useState({ username: "Loading...", email: "" });
   const [activeReport, setActiveReport] = useState(null);
   const [selectedHistoryId, setSelectedHistoryId] = useState(null);
@@ -26,6 +30,19 @@ export default function HomePage() {
     jobDescription: "",
   });
 
+  // Handle window resizing for responsive sidebar default states
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false);
+        setRightPanelOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -34,6 +51,11 @@ export default function HomePage() {
     setActiveReport(null);
     setSelectedHistoryId(null);
     setIsNewReportMode(true);
+    
+    // Close mobile sidebar automatically after selecting new report
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
   };
 
   // Fetch single report by analysis ID
@@ -48,6 +70,11 @@ export default function HomePage() {
     setLoadingReport(true);
     setIsNewReportMode(false);
     if (historyId) setSelectedHistoryId(historyId);
+
+    // Close mobile sidebar when a report is selected
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
 
     try {
       const response = await AxiosInstance.get(`/reports/${cleanId}`);
@@ -177,7 +204,7 @@ export default function HomePage() {
 
   return (
     <div className="h-screen w-full flex flex-col bg-[#080c14] text-gray-100 overflow-hidden font-sans">
-      <Header verified={user.verified} />
+      <Header verified={user.verified} onGoHome={handleStartNewReport} />
 
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar
@@ -192,15 +219,15 @@ export default function HomePage() {
         />
 
         {/* CENTER PANEL */}
-        <div className="flex-1 flex flex-col p-6 overflow-hidden bg-gradient-to-b from-[#0e1424]/50 to-transparent transition-all duration-300 relative">
-          <div className="mb-4 flex items-center justify-between shrink-0">
-            <h2 className="text-xl font-bold text-gray-100 truncate pr-4 tracking-tight">
+        <div className="flex-1 flex flex-col p-4 sm:p-6 overflow-hidden bg-gradient-to-b from-[#0e1424]/50 to-transparent transition-all duration-300 relative">
+          <div className="mb-4 flex items-center justify-between shrink-0 gap-2">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-100 truncate pr-2 tracking-tight">
               {currentTitle}
             </h2>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               {activeReport?._id && !isNewReportMode && (
-                <span className="text-xs font-mono text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20 shrink-0">
+                <span className="hidden sm:inline-block text-xs font-mono text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20 shrink-0">
                   ID: {activeReport._id}
                 </span>
               )}
@@ -208,10 +235,11 @@ export default function HomePage() {
               {/* Profile Toggle Button */}
               <button
                 onClick={() => setRightPanelOpen(!rightPanelOpen)}
-                className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border transition-all focus:outline-none ${rightPanelOpen
-                  ? "bg-blue-600/20 border-blue-500/40 text-blue-300"
-                  : "bg-white/5 border-white/10 hover:bg-white/10 text-gray-300 hover:text-white"
-                  }`}
+                className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border transition-all focus:outline-none ${
+                  rightPanelOpen
+                    ? "bg-blue-600/20 border-blue-500/40 text-blue-300"
+                    : "bg-white/5 border-white/10 hover:bg-white/10 text-gray-300 hover:text-white"
+                }`}
                 title={rightPanelOpen ? "Close Profile Details" : "View Profile Details"}
               >
                 <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-xs font-bold text-white shadow-sm overflow-hidden shrink-0">
@@ -225,12 +253,13 @@ export default function HomePage() {
                     (user.username || "J").charAt(0).toUpperCase()
                   )}
                 </div>
-                <span className="text-sm font-medium tracking-wide max-w-[120px] truncate">
+                <span className="text-xs sm:text-sm font-medium tracking-wide max-w-[80px] sm:max-w-[120px] truncate">
                   {user.username || "Profile"}
                 </span>
                 <svg
-                  className={`w-4 h-4 transition-transform duration-200 ${rightPanelOpen ? "rotate-180" : "rotate-0"
-                    }`}
+                  className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-200 ${
+                    rightPanelOpen ? "rotate-180" : "rotate-0"
+                  }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -241,7 +270,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="flex-1 rounded-2xl bg-white/[0.03] border border-white/10 p-6 overflow-y-auto shadow-2xl backdrop-blur-xl">
+          <div className="flex-1 rounded-2xl bg-white/[0.03] border border-white/10 p-4 sm:p-6 overflow-y-auto shadow-2xl backdrop-blur-xl">
             <ReportDisplay
               loadingReport={loadingReport}
               isNewReportMode={isNewReportMode}
@@ -261,8 +290,9 @@ export default function HomePage() {
 
         {/* RIGHT PANEL WRAPPER */}
         <div
-          className={`transition-all duration-300 ease-in-out flex overflow-hidden border-l border-white/5 ${rightPanelOpen ? "w-80 opacity-100" : "w-0 opacity-0"
-            }`}
+          className={`transition-all duration-300 ease-in-out flex overflow-hidden border-l border-white/5 ${
+            rightPanelOpen ? "w-80 opacity-100" : "w-0 opacity-0"
+          }`}
         >
           <div className="w-80 h-full shrink-0">
             <RightPanel
