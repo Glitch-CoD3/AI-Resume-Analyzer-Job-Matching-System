@@ -9,11 +9,11 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 
-const allowedOrigins = [
-  'https://ai-frontend-eta-henna.vercel.app',
-  'http://localhost:5173'
-];
-// const allowedOrigins = process.env.CLIENT_URI ? process.env.CLIENT_URI.split(',') : [];
+// const allowedOrigins = [
+//   'https://ai-frontend-eta-henna.vercel.app',
+//   'http://localhost:5173'
+// ];
+const allowedOrigins = process.env.CLIENT_URI ? process.env.CLIENT_URI.split(',') : [];
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
