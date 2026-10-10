@@ -12,21 +12,25 @@ app.use(cookieParser())
 app.use(morgan("dev"));
 
 
-const isProduction = process.env.NODE_ENV === "production";
-const allowedOrigins = [
-  ...(process.env.CLIENT_URI || '')
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean)
-    .map((origin) => new URL(origin).origin),
-  ...(process.env.NODE_ENV === "development" ? ['http://localhost:5173'] : []),
-];
+const allowedOrigins = (process.env.CLIENT_URI || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+  .map((origin) => new URL(origin).origin);
+
+if (process.env.NODE_ENV !== "production") {
+  allowedOrigins.push("http://localhost:5173");
+}
 
 const corsOptions = {
-  origin: (origin, callback) => {
+  origin(origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
+
+    console.error("CORS rejected origin:", origin);
+    console.error("Allowed origins:", allowedOrigins);
+
     return callback(new Error("Not allowed by CORS"));
   },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -34,11 +38,7 @@ const corsOptions = {
   credentials: true,
 };
 
-// 1. Apply CORS middleware to all incoming requests
 app.use(cors(corsOptions));
-
-// 2. Handle preflight (OPTIONS) requests using the modern regex syntax
-app.options(/(.*)/, cors(corsOptions));
 
 
 import authRoutes from './routes/auth.routes.js'
