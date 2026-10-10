@@ -52,6 +52,7 @@ export const generateInterViewReportController = async (req, res) => {
             jobdescribe: jobdescribe
         });
 
+        console.log(report)
         // Sanitize the AI response
         const sanitizedReport = sanitizeAiResponse(report);
 
@@ -69,7 +70,7 @@ export const generateInterViewReportController = async (req, res) => {
         });
 
         if (!interviewReport) {
-            return res.status(500).json({ message: "Failed to save interview report here" });
+            return res.status(500).json({ message: "Failed to save interview report" });
         }
 
         // ✅ 3. Auto-generate title for this specific submission
