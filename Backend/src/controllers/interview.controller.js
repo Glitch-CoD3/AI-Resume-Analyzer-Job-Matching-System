@@ -1,5 +1,8 @@
 import { InterviewReport } from "../models/interviewReport.models.js";
-import { generateInterviewReport } from "../services/ai.service.js";
+import {
+    generateInterviewReport,
+    interviewReportZodSchema,
+} from "../services/ai.service.js";
 // import { generateInterviewReportMis } from "../services/mistralai.ai.js"
 import { createRequire } from "module";
 import mongoose from "mongoose";
@@ -10,33 +13,42 @@ const pdfParse = require("pdf-parse");
 
 
 export const sanitizeAiResponse = (data) => {
-    // If the AI sent a string, parse it
-    let obj = typeof data === 'string' ? JSON.parse(data) : data;
-
-    // Helper to remove standalone "{" or "}" strings from arrays
-    const cleanArray = (arr) => {
-        if (!Array.isArray(arr)) return arr;
-        return arr
-            .filter(item => item !== '{' && item !== '}' && item !== ':')
-            .map(item => (typeof item === 'object' ? sanitizeAiResponse(item) : item));
-    };
-
-    // Recursively clean all fields
-    for (let key in obj) {
-        if (Array.isArray(obj[key])) {
-            obj[key] = cleanArray(obj[key]);
-        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-            obj[key] = sanitizeAiResponse(obj[key]);
+    if (typeof data === "string") {
+        try {
+            data = JSON.parse(data);
+        } catch {
+            return data;
         }
     }
-    return obj;
+
+    if (Array.isArray(data)) {
+        return data
+            .filter(
+                (item) =>
+                    item !== "{" &&
+                    item !== "}" &&
+                    item !== ":"
+            )
+            .map(sanitizeAiResponse);
+    }
+
+    if (data === null || typeof data !== "object") {
+        return data;
+    }
+
+    const result = {};
+
+    for (const [key, value] of Object.entries(data)) {
+        result[key] = sanitizeAiResponse(value);
+    }
+
+    return result;
 };
-;
+
 
 export const generateInterViewReportController = async (req, res) => {
     try {
         const userId = req.user?._id || req.userId;
-        console.log("User ID:", userId);
 
         const { resume, selfdescribe, jobdescribe } = req.body;
         if (!resume || !selfdescribe || !jobdescribe) {
@@ -47,18 +59,37 @@ export const generateInterViewReportController = async (req, res) => {
 
         // ✅ 1. Generate AI report
         const report = await generateInterviewReport({
-            resume: resume,
-            selfdescribe: selfdescribe,
-            jobdescribe: jobdescribe
+            resume,
+            selfdescribe,
+            jobdescribe,
         });
 
-        console.log("report from AI service:", report);
-        // Sanitize the AI response
+        if (!report || typeof report !== "object") {
+            console.error("AI service returned an invalid report:", report);
+
+            return res.status(502).json({
+                message: "AI service returned an invalid report",
+            });
+        }
+
         const sanitizedReport = sanitizeAiResponse(report);
 
-        if (!sanitizedReport) {
-            return res.status(500).json({ message: "Failed to generate interview report now" });
+        const validation =
+            interviewReportZodSchema.safeParse(sanitizedReport);
+
+        if (!validation.success) {
+            console.error(
+                "Controller report validation failed:",
+                JSON.stringify(validation.error.issues, null, 2)
+            );
+
+            return res.status(502).json({
+                message: "AI report structure is invalid",
+                issues: validation.error.issues,
+            });
         }
+
+        const validReport = validation.data;
 
         // ✅ 2. Save Report to DB
         const interviewReport = await InterviewReport.create({
@@ -66,7 +97,7 @@ export const generateInterViewReportController = async (req, res) => {
             resumeText: resume,
             selfDescription: selfdescribe,
             jobDescription: jobdescribe,
-            ...sanitizedReport
+            ...validReport,
         });
 
         if (!interviewReport) {
@@ -93,8 +124,12 @@ export const generateInterViewReportController = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Controller Error:", error.message);
-
+        console.error("Controller Error:", error);
+        if (error.code === "INVALID_INTERVIEW_INPUT") {
+            return res.status(400).json({
+                message: error.message
+            });
+        }
         return res.status(500).json({
             message: "Failed to generate interview report",
             error: error.message
