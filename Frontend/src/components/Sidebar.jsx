@@ -14,34 +14,28 @@ export default function Sidebar({
   handleDeleteHistory,
 }) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+const { setUser } = useAuth(); // Assuming your AuthContext exposes setUser or a reset function
 
-  const navigate = useNavigate();
+const handleLogout = async () => {
+  if (isLoggingOut) return; // Prevent multi-click spamming
+  setIsLoggingOut(true);
 
-  const { checkAuthStatus } = useAuth();
+  try {
+    // 1. Tell backend to clear the cookie
+    await AxiosInstance.post("/auth/logout");
+  } catch (error) {
+    console.error(
+      "Logout error:",
+      error.response?.data || error.message
+    );
+  } finally {
+    // 2. Clear local context state immediately
+    if (setUser) setUser(null);
 
-  // Logout Handler
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-
-    try {
-      // Clear httpOnly cookie
-      await AxiosInstance.post("/auth/logout");
-
-      // Update auth state
-      await checkAuthStatus();
-
-      // Redirect to login
-      navigate("/login", { replace: true });
-
-    } catch (error) {
-      console.error(
-        "Logout error:",
-        error.response?.data || error.message
-      );
-    } finally {
-      setIsLoggingOut(false);
-    }
-  };
+    // 3. Force a hard redirect to login to completely reset app state & cache
+    window.location.href = "/login";
+  }
+};
 
   return (
     <div
