@@ -68,3 +68,18 @@ Logout from current device
 
 POST /api/auth/logout-all
 Logout from all devices
+
+## Environment modes
+
+Run the backend from this directory:
+
+- `npm run dev` starts nodemon with `NODE_ENV=development`. Development allows `http://localhost:5173` and the origins listed in `CLIENT_URI`.
+- `npm start` starts the server with `NODE_ENV=production`. Production allows only the origins listed in `CLIENT_URI`.
+
+Set `CLIENT_URI` to one frontend origin or a comma-separated list, for example:
+
+```env
+CLIENT_URI=https://your-frontend.example
+```
+
+Keep credentials and environment-specific values in `Backend/.env` locally or configure them as environment variables on the production host.

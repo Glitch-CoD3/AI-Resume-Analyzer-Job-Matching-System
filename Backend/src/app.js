@@ -1,3 +1,4 @@
+import "./config/env.js";
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import cors from "cors";
@@ -11,9 +12,14 @@ app.use(cookieParser())
 app.use(morgan("dev"));
 
 
+const isProduction = process.env.NODE_ENV === "production";
 const allowedOrigins = [
-  'https://ai-frontend-eta-henna.vercel.app',
-  'http://localhost:5173'
+  ...(process.env.CLIENT_URI || '')
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+    .map((origin) => new URL(origin).origin),
+  ...(process.env.NODE_ENV === "development" ? ['http://localhost:5173'] : []),
 ];
 
 const corsOptions = {
