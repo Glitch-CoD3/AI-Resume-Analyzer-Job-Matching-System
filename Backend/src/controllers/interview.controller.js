@@ -52,12 +52,12 @@ export const generateInterViewReportController = async (req, res) => {
             jobdescribe: jobdescribe
         });
 
-        console.log(report)
+        console.log("report from AI service:", report);
         // Sanitize the AI response
         const sanitizedReport = sanitizeAiResponse(report);
 
         if (!sanitizedReport) {
-            return res.status(500).json({ message: "Failed to generate interview report here" });
+            return res.status(500).json({ message: "Failed to generate interview report now" });
         }
 
         // ✅ 2. Save Report to DB
