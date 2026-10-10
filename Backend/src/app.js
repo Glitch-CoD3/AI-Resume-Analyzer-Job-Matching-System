@@ -12,24 +12,17 @@ app.use(cookieParser())
 app.use(morgan("dev"));
 
 
-const allowedOrigins = (process.env.CLIENT_URI || "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean)
-  .map((origin) => new URL(origin).origin);
-
-if (process.env.NODE_ENV !== "production") {
-  allowedOrigins.push("http://localhost:5173");
-}
+const allowedOrigins = [
+  "https://ai-frontend-eta-henna.vercel.app",
+  "http://localhost:5173" // Explicitly add your local dev server
+];
 
 const corsOptions = {
   origin(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, or Postman)
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-
-    console.error("CORS rejected origin:", origin);
-    console.error("Allowed origins:", allowedOrigins);
 
     return callback(new Error("Not allowed by CORS"));
   },
@@ -39,6 +32,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
 
 
 import authRoutes from './routes/auth.routes.js'
